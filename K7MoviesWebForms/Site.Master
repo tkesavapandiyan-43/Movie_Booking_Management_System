@@ -1,0 +1,50 @@
+<%@ Master Language="C#" %>
+<%@ Import Namespace="System.Web.Security" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>K7 Movies</title>
+    <link rel="stylesheet" href="/css/site.css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body>
+<form id="form1" runat="server">
+    <header class="nav">
+        <asp:HyperLink ID="lnkBrand" runat="server" NavigateUrl="~/Default.aspx" CssClass="brand">K7 MOVIES</asp:HyperLink>
+        <nav>
+            <asp:HyperLink ID="lnkMovies" runat="server" NavigateUrl="~/Default.aspx" Text="Movies" />
+            <asp:HyperLink ID="lnkBookings" runat="server" NavigateUrl="~/MyBookings.aspx" Text="My Bookings" />
+            <asp:HyperLink ID="lnkAdmin" runat="server" NavigateUrl="~/Admin/Default.aspx" Text="Admin dashboard" CssClass="pill" Visible="false" />
+            <asp:HyperLink ID="lnkOwner" runat="server" NavigateUrl="~/Owner/Default.aspx" Text="Theatre dashboard" CssClass="pill" Visible="false" />
+            <asp:HyperLink ID="lnkLogin" runat="server" NavigateUrl="~/Login.aspx" Text="Login" />
+            <asp:HyperLink ID="lnkRegister" runat="server" NavigateUrl="~/Register.aspx" Text="Register" />
+            <asp:LinkButton ID="lnkLogout" runat="server" CssClass="linkbtn" OnClick="lnkLogout_Click" Visible="false" />
+        </nav>
+    </header>
+    <main class="container">
+        <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+    </main>
+    <footer class="foot">&copy; 2026 &middot; Online Movie Ticket Booking</footer>
+</form>
+<script src="/js/site.js"></script>
+<script runat="server">
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        bool auth = Request.IsAuthenticated;
+        lnkBookings.Visible = auth;
+        lnkLogout.Visible = auth;
+        lnkLogin.Visible = !auth;
+        lnkRegister.Visible = !auth;
+        lnkAdmin.Visible = auth && UserContext.IsAdmin();
+        lnkOwner.Visible = auth && UserContext.IsOwner();
+        if (auth) lnkLogout.Text = "Logout (" + Context.User.Identity.Name + ")";
+    }
+
+    protected void lnkLogout_Click(object sender, EventArgs e)
+    {
+        FormsAuthentication.SignOut();
+        Response.Redirect("~/Default.aspx", false);
+    }
+</script>

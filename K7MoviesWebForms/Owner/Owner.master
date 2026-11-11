@@ -1,0 +1,55 @@
+<%@ Master Language="C#" %>
+<%@ Import Namespace="System.Data" %>
+<%@ Import Namespace="System.Web.Security" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>K7 Movies Theatre Owner</title>
+    <link rel="stylesheet" href="/css/site.css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body class="admin-body">
+<form id="form1" runat="server">
+<div class="admin-shell">
+  <aside class="sidebar">
+    <div class="side-logo">K7 MOVIES</div>
+    <div class="side-title">THEATRE OWNER</div>
+    <div class="muted small" style="padding:0 1.3rem .8rem"><asp:Label ID="lblTheatre" runat="server"></asp:Label></div>
+    <nav class="side-nav">
+      <asp:HyperLink ID="navDashboard" runat="server" NavigateUrl="~/Owner/Default.aspx" Text="Dashboard" />
+      <asp:HyperLink ID="navBookings" runat="server" NavigateUrl="~/Owner/Bookings.aspx" Text="Booked tickets" />
+    </nav>
+    <div class="side-foot">
+      <asp:HyperLink runat="server" NavigateUrl="~/Default.aspx" Text="View customer site" />
+      <asp:LinkButton ID="lnkLogout" runat="server" CssClass="linkbtn" OnClick="lnkLogout_Click" />
+    </div>
+  </aside>
+  <main class="admin-main">
+    <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+  </main>
+</div>
+</form>
+<script src="/js/site.js"></script>
+<script runat="server">
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        lnkLogout.Text = "Logout (" + Context.User.Identity.Name + ")";
+        int theatreId = UserContext.OwnerTheatreId();
+        DataTable t = Db.Fill("SELECT TheatreName, Location FROM Theatres WHERE TheatreID = @T", Db.P("@T", theatreId));
+        lblTheatre.Text = t.Rows.Count == 0 ? "No theatre assigned" : (string)t.Rows[0]["TheatreName"] + ", " + (string)t.Rows[0]["Location"];
+
+        string path = Request.Url.AbsolutePath;
+        if (path.EndsWith("/Owner/Bookings.aspx", StringComparison.OrdinalIgnoreCase)) navBookings.CssClass = "active";
+        else navDashboard.CssClass = "active";
+    }
+
+    protected void lnkLogout_Click(object sender, EventArgs e)
+    {
+        FormsAuthentication.SignOut();
+        Response.Redirect("~/Default.aspx", false);
+    }
+</script>
+</body>
+</html>

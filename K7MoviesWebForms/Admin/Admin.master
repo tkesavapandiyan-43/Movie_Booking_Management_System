@@ -1,0 +1,68 @@
+<%@ Master Language="C#" %>
+<%@ Import Namespace="System.Web.Security" %>
+<!DOCTYPE html>
+<html lang="en">
+<head runat="server">
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>K7 Movies Admin</title>
+    <link rel="stylesheet" href="/css/site.css" />
+    <asp:ContentPlaceHolder ID="HeadContent" runat="server"></asp:ContentPlaceHolder>
+</head>
+<body class="admin-body">
+<form id="form1" runat="server">
+<div class="admin-shell">
+  <aside class="sidebar">
+    <div class="side-logo">K7 MOVIES</div>
+    <div class="side-title">ADMIN PANEL</div>
+    <nav class="side-nav">
+      <asp:HyperLink ID="navDashboard" runat="server" NavigateUrl="~/Admin/Default.aspx" Text="Dashboard" />
+      <asp:HyperLink ID="navMovies" runat="server" NavigateUrl="~/Admin/Movies.aspx" Text="Movies" />
+      <asp:HyperLink ID="navShows" runat="server" NavigateUrl="~/Admin/Shows.aspx" Text="Shows" />
+      <asp:HyperLink ID="navTheatres" runat="server" NavigateUrl="~/Admin/Theatres.aspx" Text="Theatres &amp; Seats" />
+      <asp:HyperLink ID="navBookings" runat="server" NavigateUrl="~/Admin/Bookings.aspx" Text="Bookings" />
+      <asp:HyperLink ID="navPayments" runat="server" NavigateUrl="~/Admin/Payments.aspx" Text="Payments" />
+      <asp:HyperLink ID="navUsers" runat="server" NavigateUrl="~/Admin/Users.aspx" Text="Users" />
+      <asp:HyperLink ID="navReports" runat="server" NavigateUrl="~/Admin/Reports.aspx" Text="Reports" />
+    </nav>
+    <div class="side-foot">
+      <asp:HyperLink runat="server" NavigateUrl="~/Default.aspx" Text="View customer site" />
+      <asp:LinkButton ID="lnkLogout" runat="server" CssClass="linkbtn" OnClick="lnkLogout_Click" />
+    </div>
+  </aside>
+  <main class="admin-main">
+    <asp:ContentPlaceHolder ID="MainContent" runat="server"></asp:ContentPlaceHolder>
+  </main>
+</div>
+</form>
+<script src="/js/site.js"></script>
+<script runat="server">
+    protected void Page_Load(object sender, EventArgs e)
+    {
+        lnkLogout.Text = "Logout (" + Context.User.Identity.Name + ")";
+        string path = Request.Url.AbsolutePath;
+        MarkActive(navDashboard, path);
+        MarkActive(navMovies, path);
+        MarkActive(navShows, path);
+        MarkActive(navTheatres, path);
+        MarkActive(navBookings, path);
+        MarkActive(navPayments, path);
+        MarkActive(navUsers, path);
+        MarkActive(navReports, path);
+        if (path.EndsWith("/Admin/Seats.aspx", StringComparison.OrdinalIgnoreCase)) navTheatres.CssClass = "active";
+    }
+
+    private void MarkActive(HyperLink link, string path)
+    {
+        string target = link.NavigateUrl.TrimStart('~', '/');
+        if (path.EndsWith("/" + target, StringComparison.OrdinalIgnoreCase)) link.CssClass = "active";
+    }
+
+    protected void lnkLogout_Click(object sender, EventArgs e)
+    {
+        FormsAuthentication.SignOut();
+        Response.Redirect("~/Default.aspx", false);
+    }
+</script>
+</body>
+</html>
